@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -2099,7 +2099,18 @@
     var exitShown = false;
     var exitDismissed = false;
 
-    document.addEventListener('mouseleave', function(e) {
+    // Show popup when mouse enters the top bar (works inside iframes)
+  var _topBarEl = document.querySelector('.top-bar');
+  if (_topBarEl) {
+    _topBarEl.addEventListener('mouseenter', function() {
+      if (!exitShown && !exitDismissed) {
+        exitShown = true;
+        setTimeout(function() { document.getElementById('exitPopup').classList.add('active'); }, 400);
+      }
+    });
+  }
+
+   document.addEventListener('mouseleave', function(e) {
       if (e.clientY <= 5 && !exitShown && !exitDismissed) {
         exitShown = true;
         setTimeout(function() {
@@ -2134,5 +2145,20 @@
     });
   </script>
 
+
+<script id="iframe-height-reporter">
+// Auto height: send page height to parent
+(function() {
+  function sendHeight() {
+    var h = document.documentElement.scrollHeight;
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'iframeHeight', height: h }, '*');
+    }
+  }
+  window.addEventListener('load', sendHeight);
+  new ResizeObserver(sendHeight).observe(document.body);
+  sendHeight();
+})();
+</script>
 </body>
 </html>
